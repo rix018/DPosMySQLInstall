@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DPosMYSQLInstall", "DPosMYSQLInstall\DPosMYSQLInstall.vbproj", "{E4FA117B-B947-4144-8420-1BA8F0C9920C}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DPosMySQLInstallSetup", "DPosMySQLInstallSetup\DPosMySQLInstallSetup.vdproj", "{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Debug|x64.Build.0 = Debug|Any CPU
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Debug|x86.ActiveCfg = Debug|x86
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Debug|x86.Build.0 = Debug|x86
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Release|x64.ActiveCfg = Release|x64
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Release|x64.Build.0 = Release|x64
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Release|x86.ActiveCfg = Release|x86
+		{E4FA117B-B947-4144-8420-1BA8F0C9920C}.Release|x86.Build.0 = Release|x86
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Debug|Any CPU.ActiveCfg = Debug
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Debug|Mixed Platforms.Build.0 = Debug
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Debug|x64.ActiveCfg = Debug
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Debug|x86.ActiveCfg = Debug
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Release|Any CPU.ActiveCfg = Release
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Release|Mixed Platforms.ActiveCfg = Release
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Release|x64.ActiveCfg = Release
+		{F9B8B794-9EA9-4490-A0DD-CCCE649C5D8B}.Release|x86.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE5B002E-59CE-40ED-B2B8-8BE04869DA23}
+	EndGlobalSection
+EndGlobal
