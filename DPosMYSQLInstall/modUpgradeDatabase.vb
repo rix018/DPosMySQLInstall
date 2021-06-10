@@ -160,6 +160,15 @@ Module modUpgradeDatabase
             If bReturn Then bReturn = CreateTablePublicHolidays()
 #End Region
 
+#Region "DeliveritsQL - tblArticles. New Column: ExcludeCondimentCharge"
+            If sDatabaseType = DatabaseType.MSSERVER Then
+                If bReturn Then bReturn = DBfieldAddMS("DeliveritSQL", "tblArticles", "ExcludeFromMinimum", "bit", False, False, True, True)
+            Else
+                If bReturn Then bReturn = DBfieldAddMY("DeliveritSQL", "tblArticles", "ExcludeFromMinimum", "bit", False, False, True, True)
+            End If
+#End Region
+
+
         Catch ex As Exception
             myMsgBox("DatabaseUpgrade: " & ex.ToString, "MySQL DPos Install and Data Import: ERROR", myMsgBoxDisplay.OkOnly)
             bReturn = False
