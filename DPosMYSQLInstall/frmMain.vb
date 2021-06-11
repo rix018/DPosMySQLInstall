@@ -278,7 +278,7 @@ Public Class frmMain
                 If bCloudEnabled = True Then
                     myMsgBox("Please open DPOSCloudSync to initialize for the first time before running DPos to avoid further problems", "Import Data Completed", 1)
                 End If
-                MyProgress += 5
+                MyProgress = 100
                 myReportProgressBar(MyProgress)
                 ImportOptionsAndInstallBtnEnabled(True)
                 bDoAnyBtnEvents = True
@@ -1927,28 +1927,29 @@ thenextstep:
                         If bBreakFiles Then
                             'calculate percentage if bulk restore files
                             Dim iBrFiles As Integer = arrFilesToImport.Count
-                            Dim iPercentPerFile As Integer = 100 / iBrFiles
-                            Dim iProgress As Integer = iPercentPerFile
+                            Dim iPercentPerFile As Decimal = 100 / iBrFiles
+                            Dim iProgress As Decimal = iPercentPerFile
                             Dim arrSkippedmsg As New ArrayList
                             Dim bError As Boolean = False
 
                             arrSkippedmsg.Clear()
 
                             For Each thisfile As String In arrFilesToImport
-
                                 sProcessImportCSV = ImportCSVFileNoHeaders(sDatabaseLocation & "\ImportfromDPOSRestore\" & thisfile, thisCSVFileInfo(1).ToString, thisCSVFileInfo(0).ToString, 10000, sError)
 
                                 If sProcessImportCSV Then
                                     If arrFilesToImport.Count <= 1 Then
                                         ReWritetoLog("Importing CSV Data File: " & thisfile, "SUCCESS")
                                     Else
-                                        If myCInt(arrFilesToImport.LastIndexOf(thisfile)) <> iBrFiles - 1 Then
-                                            ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK" & " ... " & iProgress.ToString & "%", "SUCCESS")
+                                        If arrFilesToImport.LastIndexOf(thisfile) <> iBrFiles - 1 Then
+                                            ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK" & " ... " & arrFilesToImport.LastIndexOf(thisfile) + 1 & "/" & iBrFiles, Format(iProgress, "0.0").ToString & "%")
                                         Else
-                                            If Not bError Then
-                                                ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK" & " ... 100%", "SUCCESS")
+                                            'last log determines if the app encountered any errors while importing bulk data files
+                                            If bError Then
+                                                ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK", "SKIPPED")
+                                                arrFailedImportTables.Add(sCSVFile)
                                             Else
-                                                ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK" & " ... " & iProgress.ToString & "%", "SUCCESS")
+                                                ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK", "SUCCESS")
                                             End If
                                         End If
 
@@ -1957,25 +1958,27 @@ thenextstep:
                                         If iProgress > 100 Then iProgress = 100
                                     End If
                                 Else
-                                    bError = False
+                                    bError = True
                                     If myMsgBox("Importing database [" & thisBAKfile & "] to MySQL Server has encountered an error during importing. " & vbCrLf & "Do you still want to proceed or stop import process?", "Importing Data from DPos Restore Failed", myMsgBoxDisplay.CustomYesNo, "PROCEED", "STOP") = DialogResult.OK Then
                                         If arrFilesToImport.Count <= 1 Then
                                             ReWritetoLog("Importing CSV Data File: " & thisfile, "SKIPPED")
-                                            WritetoLog("ERROR: " & sProcessImportCSV, "")
+                                            WritetoLog("ERROR: " & sError, "")
                                         Else
-                                            ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK" & " ... " & iProgress.ToString & "%", "SKIPPED")
+                                            If arrFilesToImport.LastIndexOf(thisfile) <> iBrFiles - 1 Then
+                                                ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK" & " ... " & arrFilesToImport.LastIndexOf(thisfile) + 1 & "/" & iBrFiles, Format(iProgress, "0.0").ToString & "%")
+                                            Else
+                                                'last log
+                                                ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK", "SKIPPED")
+                                                arrFailedImportTables.Add(sCSVFile)
+                                            End If
 
-                                            arrSkippedmsg.Add(thisfile & "- " & sProcessImportCSV)
+                                            arrSkippedmsg.Add(thisfile & " - " & sError)
                                             'WritetoLog("ERROR: " & sProcessImportCSV, "")
                                         End If
                                     Else
-                                        If arrFilesToImport.Count <= 1 Then
-                                            ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK", "FAILED")
-                                        Else
-                                            ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK" & " ... " & iProgress.ToString & "%", "FAILED")
-                                        End If
+                                        ReWritetoLog("Importing CSV Data File: " & thisCSVFileInfo(0).ToString & "_" & thisCSVFileInfo(1).ToString & ".BAK", "FAILED")
 
-                                        WritetoLog("ERROR: " & sProcessImportCSV, "")
+                                        WritetoLog("ERROR: " & sError, "")
 
                                         If Directory.Exists(sDatabaseLocation & "\ImportfromDPOSRestore") Then
                                             Directory.Delete(sDatabaseLocation & "\ImportfromDPOSRestore", True)
@@ -3094,7 +3097,7 @@ thenextstep:
                 Next
 
                 WritetoLog("Compressing backup files...", "")
-                sDataZipFile = CompressFiles("Data", sFilesToAdd, sZipPath, sPrefixZipFileName)
+                sDataZipFile = CompressFiles("Data", sFilesToAdd, sZipPath, sPrefixZipFileName, False)
                 If sDataZipFile <> "" Then
                     ReWritetoLog("Compressing backup files", "SUCCESS")
                 Else
@@ -3226,7 +3229,7 @@ thenextstep:
 
                 WritetoLog("", "")
                 WritetoLog("Compressing backup files...", "")
-                sDataZipFile = CompressFiles("Data", sFilesToAdd, sZipPath)
+                sDataZipFile = CompressFiles("Data", sFilesToAdd, sZipPath, True)
                 If sDataZipFile <> "" Then
                     ReWritetoLog("Compressing backup files", "SUCCESS")
                     MyProgress += 5

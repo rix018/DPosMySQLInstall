@@ -1,21 +1,34 @@
 ﻿Imports System.IO
 Imports MySql.Data.MySqlClient
+Imports DPosSecurity
 
 Module modBackup
     Public Function ExportBackupCSVMySQL(ByVal sDatabase As String, ByVal sTable As String, ByVal valPath As String) As String
         Dim sReturn As String = ""
         Dim sSQL As String
         Dim sPath As String = valPath & "\" & sDatabase.ToLower & "_" & sTable.ToLower & ".BAK"
+        Dim sString1 As String = Date.Today.Year.ToString & Date.Today.Month.ToString.PadLeft(2, "0") & Date.Today.Day.ToString.PadLeft(2, "0")
+        Dim sString2 As String = Date.Today.AddDays(1).Year.ToString & Date.Today.AddDays(1).Month.ToString.PadLeft(2, "0") & Date.Today.AddDays(1).Day.ToString.PadLeft(2, "0")
+        Dim sDataPath As String
 
         Try
-            sPath = sPath.Replace("\", "\\")
+            File.WriteAllText(sPath, modSecurity.EncryptString(sString1 & sMySQLDPosPass & sString2) & vbCrLf) 'sMySQLDPosPass
+
+            sDataPath = valPath & "\temp_" & sDatabase.ToLower & "_" & sTable.ToLower & ".BAK"
+            sDataPath = sDataPath.Replace("\", "\\")
 
             sSQL = "USE " & sDatabase & ";"
             sSQL &= "SELECT * FROM " & sTable & " "
-            sSQL &= "INTO OUTFILE '" & sPath & "' "
+            sSQL &= "INTO OUTFILE '" & sDataPath & "' "
             sSQL &= "FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '""' LINES TERMINATED BY '\n'"
 
             If ProcessMySQL(sSQL, GetConnectionStringMY(sDatabase)) <> "" Then
+                sPath = ""
+            End If
+
+            sDataPath = sDataPath.Replace("\\", "\")
+
+            If MergeTextFiles(sPath, sDataPath) = False Then
                 sPath = ""
             End If
 
@@ -135,15 +148,15 @@ Module modBackup
         Return bReturn
     End Function
 
-    Public Function CompressFiles(ByVal sType As String, ByVal sFilesToAdd As Chilkat.StringArray, ByVal sZipFilePath As String) As String
+    Public Function CompressFiles(ByVal sType As String, ByVal sFilesToAdd As Chilkat.StringArray, ByVal sZipFilePath As String, ByVal bSecured As Boolean) As String
         Dim sReturn As Boolean = False
 
-        sReturn = CompressFiles(sType, sFilesToAdd, sZipFilePath, "Data")
+        sReturn = CompressFiles(sType, sFilesToAdd, sZipFilePath, "Data", bSecured)
 
         Return sReturn
     End Function
 
-    Public Function CompressFiles(ByVal sType As String, ByVal sFilesToAdd As Chilkat.StringArray, ByVal sZipFilePath As String, ByVal sPrefixZipFileName As String) As String
+    Public Function CompressFiles(ByVal sType As String, ByVal sFilesToAdd As Chilkat.StringArray, ByVal sZipFilePath As String, ByVal sPrefixZipFileName As String, ByVal bSecured As Boolean) As String
         Dim success As Boolean
 
         If sFilesToAdd.Count <> 0 Then
@@ -165,6 +178,12 @@ Module modBackup
                 If success Then
                     'create a new zip
                     success = zip.NewZip(sZipFile)
+
+                    If bSecured Then
+                        zip.Encryption = 4
+                        zip.EncryptKeyLength = 128
+                        zip.EncryptPassword = sMySQLDPosPass
+                    End If
 
                     zip.AppendMultiple(sFilesToAdd, False)
                     zip.PasswordProtect = False

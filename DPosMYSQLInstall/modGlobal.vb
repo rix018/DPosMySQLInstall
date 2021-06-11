@@ -1252,7 +1252,7 @@ Module modGlobal
     ''' <returns>Return if breaking down in to multiple files was successful for validation purposes.</returns>
     Public Function BreakDownRestoreFilesMySQL(ByVal sFileLocation As String, ByVal sFileName As String, ByVal sFileExt As String, ByVal sTableName As String, ByVal bCopyHeader As Boolean, ByVal bReplace As Boolean, ByRef arRestoreFiles As ArrayList) As Boolean
         Dim bReturn As Boolean = True
-        Dim iMaxRow As Integer = 25000
+        Dim iMaxRow As Integer = 5000
         Dim sHeader As String = ""
         Dim iLineCount As Integer = 0
 
@@ -1266,18 +1266,18 @@ Module modGlobal
             End If
 
             If bReplace Then
-                iMaxRow = 20000
+                iMaxRow = 5000
             End If
 
             'Decrease bulk size for these tables.
             If sTableName = "tblcustomers" OrElse sTableName = "tblorderdetails" Then
                 If bReplace Then
-                    iMaxRow = 5000
+                    iMaxRow = 3000
                 Else
-                    iMaxRow = 10000
+                    iMaxRow = 2500
                 End If
             ElseIf sTableName = "tblorderheaders" Then
-                iMaxRow = 3000
+                iMaxRow = 2500
             End If
 
             'Divides file by maxrow
@@ -1296,7 +1296,7 @@ Module modGlobal
 
                         Using sw As StreamWriter = New StreamWriter(sFileLocation & newFileName)
 
-                            If bCopyHeader Then
+                            If bCopyHeader AndAlso iNumberTag > 1 Then
                                 'The first file will have the headers for this one
                                 sw.WriteLine(sHeader)
                             End If
@@ -3466,6 +3466,19 @@ Module modGlobal
         End Try
 
         Return bExists
+
+    End Function
+
+    Public Function GetNumeric(ByVal value As String) As Integer
+
+        Dim integerVal As String = String.Empty
+        Dim collection As MatchCollection = Regex.Matches(value, "\d+")
+
+        For Each m As Match In collection
+            integerVal += m.ToString()
+        Next
+
+        Return Convert.ToInt32(integerVal)
 
     End Function
 
