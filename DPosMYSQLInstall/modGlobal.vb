@@ -253,6 +253,7 @@ Module modGlobal
         arDPOSTables.Add("deliveritsql" & CHAR_PARA & "tblBalanceSheet" & CHAR_PARA & "(`RecID` int(11) NOT NULL AUTO_INCREMENT, `SheetDate` varchar(50) DEFAULT NULL, `Name` varchar(50) DEFAULT NULL, `ShopSales` double DEFAULT NULL, `PickUpSales` double DEFAULT NULL, `DeliverySales` double DEFAULT NULL, `TableSales` double DEFAULT NULL, `TotalSales` double DEFAULT NULL, `ExcludedSales` double DEFAULT NULL, `TotalCash` double DEFAULT NULL, `TotalPaid` double DEFAULT NULL, `TotalUnpaid` double DEFAULT NULL, `TillFloat` double DEFAULT NULL, `TotalExpenses` double DEFAULT NULL, `TotalReceipts` double DEFAULT NULL, `TotalBalance` double DEFAULT NULL, `UnderOver` double DEFAULT NULL, `Notes` varchar(255) DEFAULT NULL, `PaidComputer` varchar(50) DEFAULT NULL, `OOPaidAmt` double DEFAULT NULL, `OOPaidOnlineAmt` double DEFAULT NULL, `OOPaidInStoreAmt` double DEFAULT NULL, `OOUnpaidAmt` double DEFAULT NULL, PRIMARY KEY (`RecID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8")
         arDPOSTables.Add("deliveritsql" & CHAR_PARA & "tblBalanceSheetExpenses" & CHAR_PARA & "(`RecID` int(11) NOT NULL AUTO_INCREMENT, `ExpenseDate` varchar(50) DEFAULT NULL, `Description` varchar(255) DEFAULT NULL, `ExpenseAmt` double DEFAULT NULL, `PaidComputer` varchar(50) DEFAULT NULL, PRIMARY KEY (`RecID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8")
         arDPOSTables.Add("deliveritsql" & CHAR_PARA & "tblBalanceSheetPayments" & CHAR_PARA & "(`RecID` int(11) NOT NULL AUTO_INCREMENT, `PaymentDate` varchar(50) DEFAULT NULL, `PaymentType` varchar(50) DEFAULT NULL, `PaymentTypeID` int(11) DEFAULT NULL, `Calc` double DEFAULT NULL, `BSUser` double DEFAULT NULL, `PaidComputer` varchar(50) DEFAULT NULL, PRIMARY KEY (`RecID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8")
+        arDPOSTables.Add("deliveritsql" & CHAR_PARA & "tblBarcodeItems" & CHAR_PARA & "(`RecID` int(11) NOT NULL AUTO_INCREMENT, `Code` varchar(100) DEFAULT NULL, `PLU` varchar(50) DEFAULT NULL, PRIMARY KEY (`RecID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8")
         arDPOSTables.Add("deliveritsql" & CHAR_PARA & "tblButtons" & CHAR_PARA & "(`RecID` int(11) NOT NULL AUTO_INCREMENT, `ButtonID` int(11) DEFAULT NULL, `Text` varchar(25) CHARACTER SET utf8 DEFAULT NULL, `Action` varchar(50) CHARACTER SET utf8 DEFAULT NULL, `BackColour` varchar(50) CHARACTER SET utf8 DEFAULT NULL, `ForeColour` varchar(50) CHARACTER SET utf8 DEFAULT NULL, PRIMARY KEY (`RecID`)) ENGINE=InnoDB DEFAULT CHARSET=latin1")
         arDPOSTables.Add("deliveritsql" & CHAR_PARA & "tblCategory" & CHAR_PARA & "(`CategoryID` int(11) NOT NULL AUTO_INCREMENT, `Description` varchar(255) DEFAULT NULL, `Active` smallint(1) DEFAULT NULL, `XeroAccountCode` varchar(25) DEFAULT NULL, `XeroAccountName` varchar(255) DEFAULT NULL, `XeroGSTExempt` smallint(1) DEFAULT NULL, PRIMARY KEY (`CategoryID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8")
         arDPOSTables.Add("deliveritsql" & CHAR_PARA & "tblCommentsHistory" & CHAR_PARA & "(`ID` int(11) NOT NULL AUTO_INCREMENT, `CustomerID` float DEFAULT NULL, `NoteDate` varchar(20) DEFAULT NULL, `NoteText` varchar(255) DEFAULT NULL, `UserID` varchar(20) DEFAULT NULL, `Status` smallint(1) DEFAULT NULL, `CompleteDate` varchar(20) DEFAULT NULL, PRIMARY KEY (`ID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8")
@@ -461,6 +462,8 @@ Module modGlobal
                 sReturn.Append("RecID,ExpenseDate,Description,ExpenseAmt,PaidComputer")
             Case "tblBalanceSheetPayments"
                 sReturn.Append("RecID,PaymentDate,PaymentType,PaymentTypeID,Calc,BSUser,PaidComputer")
+            Case "tblBarcodeItems"
+                sReturn.Append("RecID,Code,PLU")
             Case "tblButtons"
                 sReturn.Append("RecID,ButtonID,Text,Action,BackColour,ForeColour")
             Case "tblCategory"
@@ -614,6 +617,8 @@ Module modGlobal
                 Case "tblBalanceSheetPayments"
                     sScript = "exec master..xp_cmdshell 'bcp ""SELECT RecID, char(34) + PaymentDate + char(34), char(34) + PaymentType + char(34), PaymentTypeID, char(34) + CONVERT(varchar(20), Calc) + char(34), "
                     sScript &= "char(34) + CONVERT(varchar(20), BSUser) + char(34), char(34) + PaidComputer + char(34) FROM [DeliveritSQL].[dbo].[tblBalanceSheetPayments]"" queryout " & sDestination & sFileName & " -c -T -t"",""'"
+                Case "tblBarcodeItems"
+                    sScript = "exec master..xp_cmdshell 'bcp ""SELECT RecID, char(34) + Code + char(34), char(34) + PLU + char(34) FROM [DeliveritSQL].[dbo].[tblBarcodeItems]"" queryout " & sDestination & sFileName & " -c -T -t"",""'"
                 Case "tblButtons"
                     sScript = "exec master..xp_cmdshell 'bcp ""SELECT RecID, ButtonID, DeliveritSQL.dbo.fn_Esc(Text), char(34) + Action + char(34), char(34) + BackColour + char(34), char(34) + ForeColour + char(34) "
                     sScript &= "FROM [DeliveritSQL].[dbo].[tblButtons]"" queryout " & sDestination & sFileName & " -c -T -t"",""'"
@@ -1277,7 +1282,7 @@ Module modGlobal
                     iMaxRow = 2500
                 End If
             ElseIf sTableName = "tblorderheaders" Then
-                iMaxRow = 2500
+                iMaxRow = 1000
             End If
 
             'Divides file by maxrow

@@ -160,12 +160,16 @@ Module modUpgradeDatabase
             If bReturn Then bReturn = CreateTablePublicHolidays()
 #End Region
 
-#Region "DeliveritsQL - tblArticles. New Column: ExcludeCondimentCharge"
+#Region "DeliveritsQL - tblArticles. New Column: ExcludeFromMinimum (02.20.10)"
             If sDatabaseType = DatabaseType.MSSERVER Then
                 If bReturn Then bReturn = DBfieldAddMS("DeliveritSQL", "tblArticles", "ExcludeFromMinimum", "bit", False, False, True, True)
             Else
                 If bReturn Then bReturn = DBfieldAddMY("DeliveritSQL", "tblArticles", "ExcludeFromMinimum", "bit", False, False, True, True)
             End If
+#End Region
+
+#Region "DeliveritSQL - New Table tblBarcodeItems (02.20.10)"
+            If bReturn Then bReturn = CreateTableBarcodeItems()
 #End Region
 
 
@@ -469,6 +473,53 @@ Module modUpgradeDatabase
             bReturn = True
         Catch ex As Exception
             myMsgBox("CreateTablePublicHolidays: " & ex.ToString, "MySQL DPos Install and Data Import: ERROR", myMsgBoxDisplay.OkOnly)
+        End Try
+
+        Return bReturn
+    End Function
+
+    Public Function CreateTableBarcodeItems() As Boolean
+
+        Dim sql As String
+        Dim bReturn As Boolean = False
+        Dim sProcess As String = ""
+
+        If sDatabaseType = DatabaseType.MSSERVER Then
+            sql = "IF NOT EXISTS "
+            sql &= "(SELECT * FROM INFORMATION_SCHEMA.TABLES "
+            sql &= "WHERE TABLE_NAME = 'tblBarcodeItems') "
+            sql &= "BEGIN "
+            sql &= "CREATE TABLE tblBarcodeItems( "
+            sql &= "RecID int identity(1,1) CONSTRAINT tblBarcodeItems_PK PRIMARY KEY, "
+            sql &= "Code NVARCHAR(100), "
+            sql &= "PLU NVARCHAR(50)) "
+            sql &= "END "
+        Else
+            sql = "USE deliveritsql;"
+            sql &= "DROP TABLE IF EXISTS tblBarcodeItems;"
+            sql &= "CREATE TABLE tblBarcodeItems ("
+            sql &= "`RecID` int(11) Not NULL AUTO_INCREMENT, "
+            sql &= "`Code` varchar(100) DEFAULT NULL, "
+            sql &= "`PLU` varchar(50) DEFAULT NULL, "
+            sql &= "PRIMARY KEY (`RecID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8"
+        End If
+
+        Try
+            If sDatabaseType = DatabaseType.MSSERVER Then
+                sProcess = ProcessMSSERVER(sql, GetConnectionStringMS("DeliveritSQL"))
+                If sProcess <> "" Then
+                    Return bReturn
+                End If
+            Else
+                sProcess = ProcessMySQL(sql, GetConnectionStringMS("DeliveritSQL"))
+                If sProcess <> "" Then
+                    Return bReturn
+                End If
+            End If
+
+            bReturn = True
+        Catch ex As Exception
+            myMsgBox("CreateTableBarcodeItems: " & ex.ToString, "MySQL DPos Install and Data Import: ERROR", myMsgBoxDisplay.OkOnly)
         End Try
 
         Return bReturn
