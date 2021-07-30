@@ -374,6 +374,10 @@ Module modGlobal
         arDPOSIndex.Add("deliveritsql" & CHAR_PARA & "tblSettings" & CHAR_PARA & "Setting")
 
         arDPOSIndex.Add("deliveritsql" & CHAR_PARA & "tblTableSettings" & CHAR_PARA & "TableNoID")
+
+        arDPOSIndex.Add("streetssql" & CHAR_PARA & "tblStreets" & CHAR_PARA & "Street")
+        arDPOSIndex.Add("streetssql" & CHAR_PARA & "tblStreets" & CHAR_PARA & "Suburb")
+        arDPOSIndex.Add("streetssql" & CHAR_PARA & "tblStreets" & CHAR_PARA & "DeliveryZone")
 #End Region
 
 #Region "Foreign Keys"
