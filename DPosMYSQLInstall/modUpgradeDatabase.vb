@@ -172,6 +172,14 @@ Module modUpgradeDatabase
             If bReturn Then bReturn = CreateTableBarcodeItems()
 #End Region
 
+#Region "DeliveritSQL - tblOrderHeaders. New Column: SubItem"
+            If sDatabaseType = DatabaseType.MSSERVER Then
+                If bReturn Then bReturn = DBfieldAddMS("DeliveritSQL", "tblOrderHeaders", "ServiceFee", "money", False, False, True, True)
+            Else
+                If bReturn Then bReturn = DBfieldAddMY("DeliveritSQL", "tblOrderHeaders", "ServiceFee", "double", False, False, True, True)
+            End If
+#End Region
+
 
         Catch ex As Exception
             myMsgBox("DatabaseUpgrade: " & ex.ToString, "MySQL DPos Install and Data Import: ERROR", myMsgBoxDisplay.OkOnly)
