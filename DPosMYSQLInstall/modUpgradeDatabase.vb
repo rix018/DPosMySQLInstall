@@ -172,11 +172,19 @@ Module modUpgradeDatabase
             If bReturn Then bReturn = CreateTableBarcodeItems()
 #End Region
 
-#Region "DeliveritSQL - tblOrderHeaders. New Column: SubItem"
+#Region "DeliveritSQL - tblOrderHeaders. New Column: ServiceFee (02.20.13)"
             If sDatabaseType = DatabaseType.MSSERVER Then
                 If bReturn Then bReturn = DBfieldAddMS("DeliveritSQL", "tblOrderHeaders", "ServiceFee", "money", False, False, True, True)
             Else
                 If bReturn Then bReturn = DBfieldAddMY("DeliveritSQL", "tblOrderHeaders", "ServiceFee", "double", False, False, True, True)
+            End If
+#End Region
+
+#Region "DeliveritSQL - tblSubCategory. New Column: HalfHalfFee (02.20.14)"
+            If sDatabaseType = DatabaseType.MSSERVER Then
+                If bReturn Then bReturn = DBfieldAddMS("DeliveritSQL", "tblSubCategory", "HalfHalfFee", "money", False, False, True, True)
+            Else
+                If bReturn Then bReturn = DBfieldAddMY("DeliveritSQL", "tblSubCategory", "HalfHalfFee", "money", False, False, True, True)
             End If
 #End Region
 
